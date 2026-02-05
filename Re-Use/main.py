@@ -1,1 +1,4 @@
-break
+import pygame
+
+
+pygame.init()
