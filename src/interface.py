@@ -6,11 +6,9 @@ from src.niveaux.niveau1 import lancer_niveau1
 pygame.init()
 pygame.mixer.init()
 
-# on recupere la taille de l'ecran pour le fullscreen
-info = pygame.display.Info()
-LARGEUR = info.current_w
-HAUTEUR = info.current_h
-fenetre = pygame.display.set_mode((LARGEUR, HAUTEUR), pygame.FULLSCREEN)
+LARGEUR = 1280
+HAUTEUR = 720
+fenetre = pygame.display.set_mode((LARGEUR, HAUTEUR))
 pygame.display.set_caption("Re-Use")
 
 VERT_BG    = (10,  28,  13)
