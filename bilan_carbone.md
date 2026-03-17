@@ -1,26 +1,31 @@
-# Bilan Carbone - Re-Use
+# Bilan carbone - Re-Use
 
 ## Hypotheses
 
 - Duree moyenne d'une partie : 2 minutes
-- Materiel : PC portable consommant environ 30W
-- Affichage : 60 FPS, resolution 1920x1080
-- Pas de serveur distant, le jeu tourne en local
+- Type de machine : PC portable (consommation moyenne 30W)
+- Rafraichissement : 60 images par seconde (60 FPS)
+- Ecran : 1280x720 pixels
+- Bibliotheque : Pygame
 
-## Calcul de la consommation par partie
+## Calculs
 
-- Consommation electrique par partie : 30W x (2/60) h = **1 Wh = 0.001 kWh**
-- Mix energetique francais : environ 50g CO2/kWh (source : RTE)
-- Emissions par partie : 0.001 kWh x 50g CO2/kWh = **0.05g CO2 par partie**
+Consommation par partie :
+- Puissance = 30 W
+- Duree = 2 min = 0.0333 h
+- Energie = 30 x 0.0333 = 1 Wh = 0.001 kWh
 
-## A grande echelle
+Emissions CO2 par partie (mix electrique francais = 50 g CO2/kWh) :
+- 0.001 x 50 = 0.05 g CO2 par partie
 
-- Pour 1000 parties : 1000 x 0.05g = **50g CO2**
-- Equivalent : environ 300m en voiture (source : ADEME, 150g CO2/km)
+Pour 1000 parties :
+- 1000 x 0.05 = 50 g CO2
+- C'est l'equivalent de 300 metres en voiture
 
-## Mesures d'eco-conception
+## Actions d'eco-conception
 
-- **Limitation a 60 FPS** : on utilise `clock.tick(60)` pour ne pas faire tourner le GPU a fond
-- **Particules limitees** : maximum 20 particules par explosion pour limiter les calculs
-- **Pas de musique de fond** : evite de charger des fichiers audio lourds en memoire
-- **Images generees par code** : tous les objets (poubelles, joueur, objets) sont dessines avec pygame.draw, pas de fichiers image externes lourds
+- On limite le jeu a 60 FPS avec clock.tick(60) pour pas utiliser le CPU a fond
+- Les graphismes sont dessines par code (pas de fichiers images lourds a charger)
+- Le nombre de calculs par frame est reduit (on fait les calculs de physique une seule fois par boucle)
+- Pas de musique de fond en boucle pour reduire la charge CPU
+- La resolution est fixe (1280x720) pas besoin de calculs d'adaptation

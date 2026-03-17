@@ -1,226 +1,192 @@
+# interface.py - ecran principal du jeu Re-Use
+# pygame est la seule bibliotheque externe (obligatoire pour le projet)
 import pygame
 import webbrowser
-from src.niveaux.niveau1 import lancer_niveau1
+from niveaux.niveau1 import lancer_niveau1
 
-# initialisation de pygame et du mixer pour le son
 pygame.init()
-pygame.mixer.init()
 
+# on utilise une taille fixe pour eviter les bugs d'affichage
 LARGEUR = 1280
 HAUTEUR = 720
 fenetre = pygame.display.set_mode((LARGEUR, HAUTEUR))
 pygame.display.set_caption("Re-Use")
 
-VERT_BG    = (10,  28,  13)
-VERT_CARTE = (18,  50,  22)
-VERT_VIF   = (72, 240, 100)
-VERT_SOMB  = (35,  80,  42)
-BLANC      = (230, 245, 232)
-GRIS       = ( 90, 115,  95)
-NOIR       = (  5,  10,   6)
-GITHUB_BG  = ( 22,  22,  28)
+# couleurs du jeu (on les met dans des variables pour pas se repeter)
+VERT_BG = (10, 28, 13)
+VERT_VIF = (72, 240, 100)
+VERT_SOMB = (35, 80, 42)
+BLANC = (230, 245, 232)
+GRIS = (90, 115, 95)
+NOIR = (5, 10, 6)
 
-police_titre  = pygame.font.SysFont("Arial", 96)
-police_sous   = pygame.font.SysFont("Arial", 22)
-police_btn    = pygame.font.SysFont("Arial", 26)
-police_petite = pygame.font.SysFont("Arial", 20)
-police_url    = pygame.font.SysFont("Arial", 18)
+# polices pour le texte
+police_titre = pygame.font.SysFont("Arial", 80)
+police_sous = pygame.font.SysFont("Arial", 22)
+police_btn = pygame.font.SysFont("Arial", 26)
+police_petite = pygame.font.SysFont("Arial", 18)
 
-son_active      = True
-volume          = 7
-meilleur_score  = 0
-ecran_actuel    = "accueil"
-
-
-def arrondi(surface, couleur, rect, rayon):
-    pygame.draw.rect(surface, couleur, rect, border_radius=rayon)
+# variables du jeu
+son_active = True
+volume = 7
+meilleur_score = 0
+ecran_actuel = "accueil"
 
 
-def texte_centre(surface, texte, police, couleur, cx, cy):
+# fonction pour afficher du texte centre a une position
+def afficher_texte_centre(texte, police, couleur, cx, cy):
     rendu = police.render(texte, True, couleur)
-    surface.blit(rendu, (cx - rendu.get_width() // 2, cy - rendu.get_height() // 2))
+    x = cx - rendu.get_width() // 2
+    y = cy - rendu.get_height() // 2
+    fenetre.blit(rendu, (x, y))
 
 
-def bouton(surface, texte, cx, cy, larg, haut, fond, col_txt, rayon=16):
-    rect = pygame.Rect(cx - larg // 2, cy - haut // 2, larg, haut)
-    arrondi(surface, fond, rect, rayon)
-    texte_centre(surface, texte, police_btn, col_txt, cx, cy)
+# fonction pour dessiner un bouton et retourner son rectangle
+def dessiner_bouton(texte, cx, cy, largeur, hauteur, couleur_fond, couleur_texte):
+    rect = pygame.Rect(cx - largeur // 2, cy - hauteur // 2, largeur, hauteur)
+    pygame.draw.rect(fenetre, couleur_fond, rect, border_radius=14)
+    afficher_texte_centre(texte, police_btn, couleur_texte, cx, cy)
     return rect
 
 
-def bouton_cercle(surface, texte, cx, cy, r, fond, col_txt):
-    pygame.draw.circle(surface, fond, (cx, cy), r)
-    texte_centre(surface, texte, police_btn, col_txt, cx, cy)
-    return pygame.Rect(cx - r, cy - r, r * 2, r * 2)
-
-
-# dessine l'ecran d'accueil avec le titre et les boutons
+# dessine l'ecran d'accueil et retourne les rectangles des boutons
 def dessiner_accueil():
     fenetre.fill(VERT_BG)
-    pygame.draw.circle(fenetre, (16, 52, 20), (LARGEUR - 180, 160), 380)
-    pygame.draw.circle(fenetre, (12, 38, 15), (130, HAUTEUR - 90), 260)
 
-    re  = police_titre.render("Re",   True, VERT_VIF)
-    use = police_titre.render("-Use", True, BLANC)
-    total = re.get_width() + use.get_width()
-    tx = (LARGEUR - total) // 2
-    ty = HAUTEUR // 2 - 220
-    fenetre.blit(re,  (tx, ty))
-    fenetre.blit(use, (tx + re.get_width(), ty))
+    # titre du jeu
+    texte_re = police_titre.render("Re", True, VERT_VIF)
+    texte_use = police_titre.render("-Use", True, BLANC)
+    total_largeur = texte_re.get_width() + texte_use.get_width()
+    tx = (LARGEUR - total_largeur) // 2
+    ty = HAUTEUR // 2 - 200
+    fenetre.blit(texte_re, (tx, ty))
+    fenetre.blit(texte_use, (tx + texte_re.get_width(), ty))
 
-    # petit slogan en dessous du titre
-    sous = police_sous.render("Trie · Recycle · Sauve la planete ", True, GRIS)
-    fenetre.blit(sous, ((LARGEUR - sous.get_width()) // 2, ty + 115))
+    # sous-titre
+    sous = police_sous.render("Trie - Recycle - Sauve la planete", True, GRIS)
+    fenetre.blit(sous, ((LARGEUR - sous.get_width()) // 2, ty + 100))
 
-    pygame.draw.line(fenetre, VERT_SOMB,
-                     (LARGEUR // 2 - 180, ty + 165),
-                     (LARGEUR // 2 + 180, ty + 165), 1)
+    # boutons
+    cy_jouer = HAUTEUR // 2 + 20
+    rect_jouer = dessiner_bouton("Jouer", LARGEUR // 2, cy_jouer, 300, 65, VERT_VIF, NOIR)
+    rect_param = dessiner_bouton("Parametres", LARGEUR // 2, cy_jouer + 100, 300, 55, VERT_SOMB, BLANC)
 
-    cy_jouer = HAUTEUR // 2 + 10
-    rect_jouer = bouton(fenetre, "Jouer",
-                        LARGEUR // 2, cy_jouer,
-                        340, 72, VERT_VIF, NOIR, rayon=20)
-
-    rect_param = bouton(fenetre, "Paramètres",
-                        LARGEUR // 2, cy_jouer + 110,
-                        340, 62, VERT_SOMB, BLANC, rayon=16)
-
-    rect_git = bouton(fenetre, "GitHub — Re-Use",
-                      LARGEUR // 2, HAUTEUR - 90,
-                      360, 52, GITHUB_BG, (170, 170, 185), rayon=14)
-
-    lien = police_url.render("https://github.com/adrisko/Re-Use", True, (55, 90, 60))
-    fenetre.blit(lien, ((LARGEUR - lien.get_width()) // 2, HAUTEUR - 58))
-
-    esc = police_url.render("ESC  quitter", True, (45, 65, 50))
-    fenetre.blit(esc, (28, HAUTEUR - 34))
-
+    # meilleur score si il y en a un
     if meilleur_score > 0:
-        ms = police_petite.render("  Meilleur score : {}".format(meilleur_score), True, VERT_VIF)
-        fenetre.blit(ms, ((LARGEUR - ms.get_width()) // 2, ty + 145))
+        texte_score = police_petite.render("Meilleur score : {}".format(meilleur_score), True, VERT_VIF)
+        fenetre.blit(texte_score, ((LARGEUR - texte_score.get_width()) // 2, ty + 130))
 
-    return rect_jouer, rect_param, rect_git
+    # indication pour quitter
+    esc = police_petite.render("ESC pour quitter", True, GRIS)
+    fenetre.blit(esc, (20, HAUTEUR - 30))
+
+    return rect_jouer, rect_param
 
 
-# TODO: ajouter le niveau 2 ici
+# dessine l'ecran de selection des niveaux
 def dessiner_niveaux():
     fenetre.fill(VERT_BG)
-    pygame.draw.circle(fenetre, (16, 52, 20), (LARGEUR - 160, 200), 320)
 
     titre = police_titre.render("Niveaux", True, BLANC)
-    fenetre.blit(titre, ((LARGEUR - titre.get_width()) // 2, 70))
+    fenetre.blit(titre, ((LARGEUR - titre.get_width()) // 2, 50))
 
-    sous = police_sous.render("Choisis ta difficulte", True, GRIS)
-    fenetre.blit(sous, ((LARGEUR - sous.get_width()) // 2, 188))
-
-    niveaux = [
-        ("Niveau 1", "Debutant",       "Trie les plastiques de base",    VERT_VIF,       NOIR),
-        ("Niveau 2", "Intermediaire",  "Melanges et matieres difficiles", (255, 200, 60), NOIR),
-        ("Niveau 3", "Expert",         "Tout doit etre recycle !",        (255, 90, 90),  BLANC),
+    # on met les infos des niveaux dans une liste de dictionnaires
+    niveaux_info = [
+        {"nom": "Niveau 1", "difficulte": "Debutant", "couleur": VERT_VIF},
+        {"nom": "Niveau 2", "difficulte": "Intermediaire", "couleur": (255, 200, 60)},
+        {"nom": "Niveau 3", "difficulte": "Expert", "couleur": (255, 90, 90)},
     ]
 
-    rects = []
-    for i, (nom, diff, desc, coul, tc) in enumerate(niveaux):
-        cy = 310 + i * 145
-        rect = pygame.Rect(LARGEUR // 2 - 340, cy - 60, 680, 118)
-        arrondi(fenetre, VERT_CARTE, rect, 18)
-        arrondi(fenetre, coul, pygame.Rect(LARGEUR // 2 - 340, cy - 60, 8, 118), 6)
+    liste_rects = []
+    for i in range(len(niveaux_info)):
+        cy = 220 + i * 120
+        rect = pygame.Rect(LARGEUR // 2 - 250, cy - 40, 500, 80)
+        pygame.draw.rect(fenetre, VERT_SOMB, rect, border_radius=12)
 
-        t_nom  = police_btn.render(nom,   True, coul)
-        t_diff = police_petite.render(diff,  True, GRIS)
-        t_desc = police_petite.render(desc,  True, (135, 170, 142))
-        fleche = police_btn.render("→",    True, coul)
+        couleur = niveaux_info[i]["couleur"]
+        nom = niveaux_info[i]["nom"]
+        diff = niveaux_info[i]["difficulte"]
 
-        fenetre.blit(t_nom,  (LARGEUR // 2 - 310, cy - 28))
-        fenetre.blit(t_diff, (LARGEUR // 2 - 310, cy + 14))
-        fenetre.blit(t_desc, (LARGEUR // 2,        cy +  8))
-        fenetre.blit(fleche, (LARGEUR // 2 + 290,  cy - 14))
-        rects.append(rect)
+        afficher_texte_centre(nom, police_btn, couleur, LARGEUR // 2 - 50, cy - 8)
+        afficher_texte_centre(diff, police_petite, GRIS, LARGEUR // 2 - 50, cy + 18)
+        liste_rects.append(rect)
 
-    rect_retour = bouton(fenetre, "← Retour",
-                         LARGEUR // 2, HAUTEUR - 80,
-                         280, 54, VERT_SOMB, BLANC, rayon=14)
+    rect_retour = dessiner_bouton("Retour", LARGEUR // 2, HAUTEUR - 70, 250, 50, VERT_SOMB, BLANC)
 
-    return rects, rect_retour
+    return liste_rects, rect_retour
 
 
-# fenetre de parametres, on met un overlay sombre par dessus
+# dessine le panneau des parametres par dessus l'ecran actuel
 def dessiner_parametres():
-    overlay = pygame.Surface((LARGEUR, HAUTEUR), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 210))
+    # fond sombre transparent
+    overlay = pygame.Surface((LARGEUR, HAUTEUR))
+    overlay.set_alpha(200)
+    overlay.fill((0, 0, 0))
     fenetre.blit(overlay, (0, 0))
 
-    cw, ch = 540, 420
-    ox = (LARGEUR - cw) // 2
-    oy = (HAUTEUR - ch) // 2
-    arrondi(fenetre, VERT_CARTE, pygame.Rect(ox, oy, cw, ch), 26)
+    # panneau central
+    panneau_w = 480
+    panneau_h = 350
+    px = (LARGEUR - panneau_w) // 2
+    py = (HAUTEUR - panneau_h) // 2
+    pygame.draw.rect(fenetre, VERT_SOMB, (px, py, panneau_w, panneau_h), border_radius=18)
 
-    t = police_btn.render("Paramètres", True, BLANC)
-    fenetre.blit(t, (ox + (cw - t.get_width()) // 2, oy + 28))
+    afficher_texte_centre("Parametres", police_btn, BLANC, LARGEUR // 2, py + 35)
 
-    pygame.draw.line(fenetre, VERT_SOMB,
-                     (ox + 30, oy + 82), (ox + cw - 30, oy + 82), 1)
+    # option son
+    texte_son = police_petite.render("Son", True, BLANC)
+    fenetre.blit(texte_son, (px + 40, py + 90))
 
-    label = police_petite.render("Son", True, BLANC)
-    fenetre.blit(label, (ox + 50, oy + 108))
+    if son_active:
+        etat = "ON"
+        couleur_etat = VERT_VIF
+    else:
+        etat = "OFF"
+        couleur_etat = (210, 70, 70)
 
-    etat  = "ON"  if son_active else "OFF"
-    e_col = VERT_VIF if son_active else (210, 70, 70)
-    rect_toggle = bouton(fenetre, etat,
-                         ox + cw - 90, oy + 118,
-                         100, 40, VERT_SOMB, e_col, rayon=12)
+    rect_toggle = dessiner_bouton(etat, px + panneau_w - 80, py + 100, 90, 36, VERT_BG, couleur_etat)
 
-    pygame.draw.line(fenetre, VERT_SOMB,
-                     (ox + 30, oy + 168), (ox + cw - 30, oy + 168), 1)
+    # volume
+    texte_vol = police_petite.render("Volume : {} %".format(volume * 10), True, BLANC)
+    fenetre.blit(texte_vol, (px + 40, py + 160))
 
-    label_v = police_petite.render("Volume", True, BLANC)
-    fenetre.blit(label_v, (ox + 50, oy + 195))
+    rect_moins = dessiner_bouton("-", px + panneau_w - 150, py + 170, 50, 36, VERT_BG, BLANC)
+    rect_plus = dessiner_bouton("+", px + panneau_w - 80, py + 170, 50, 36, VERT_BG, BLANC)
 
-    mid_y = oy + 258
-
-    rect_moins = bouton_cercle(fenetre, "−",
-                               ox + 90, mid_y, 30,
-                               VERT_SOMB, BLANC)
-
-    vol_str = police_btn.render("{} %".format(volume*10), True, VERT_VIF)
-    fenetre.blit(vol_str, (ox + cw // 2 - vol_str.get_width() // 2, mid_y - vol_str.get_height() // 2))
-
-    rect_plus = bouton_cercle(fenetre, "+",
-                              ox + cw - 90, mid_y, 30,
-                              VERT_SOMB, BLANC)
-
-    bx = ox + 50
-    by = oy + 308
-    bl = cw - 100
-    arrondi(fenetre, VERT_SOMB, pygame.Rect(bx, by, bl, 10), 5)
+    # barre de volume
+    barre_x = px + 40
+    barre_y = py + 220
+    barre_l = panneau_w - 80
+    pygame.draw.rect(fenetre, VERT_BG, (barre_x, barre_y, barre_l, 8), border_radius=4)
     if volume > 0:
-        arrondi(fenetre, VERT_VIF,
-                pygame.Rect(bx, by, int(bl * volume / 10), 10), 5)
+        longueur_remplie = int(barre_l * volume / 10)
+        pygame.draw.rect(fenetre, VERT_VIF, (barre_x, barre_y, longueur_remplie, 8), border_radius=4)
 
-    rect_fermer = bouton(fenetre, "✕  Fermer",
-                         ox + cw // 2, oy + ch - 44,
-                         220, 50, VERT_SOMB, GRIS, rayon=14)
+    # bouton fermer
+    rect_fermer = dessiner_bouton("Fermer", LARGEUR // 2, py + panneau_h - 45, 200, 45, VERT_BG, GRIS)
 
     return rect_toggle, rect_moins, rect_plus, rect_fermer
 
 
-# ===================== BOUCLE PRINCIPALE =====================
-# boucle principale du jeu, tourne à 60 fps
-horloge  = pygame.time.Clock()
+# === boucle principale du jeu ===
+horloge = pygame.time.Clock()
 en_cours = True
 
 while en_cours:
 
+    # on dessine l'ecran selon la page actuelle
     if ecran_actuel == "accueil":
-        rect_jouer, rect_param, rect_git = dessiner_accueil()
+        rect_jouer, rect_param = dessiner_accueil()
 
     elif ecran_actuel == "niveaux":
         rects_niveaux, rect_retour = dessiner_niveaux()
 
     elif ecran_actuel == "parametres":
-        rect_jouer, rect_param, rect_git = dessiner_accueil()
+        # on dessine l'accueil en fond puis les parametres par dessus
+        rect_jouer, rect_param = dessiner_accueil()
         rect_toggle, rect_moins, rect_plus, rect_fermer = dessiner_parametres()
 
+    # on gere les evenements (clavier et souris)
     for ev in pygame.event.get():
 
         if ev.type == pygame.QUIT:
@@ -228,21 +194,20 @@ while en_cours:
 
         if ev.type == pygame.KEYDOWN:
             if ev.key == pygame.K_ESCAPE:
-                if ecran_actuel in ("parametres", "niveaux"):
+                if ecran_actuel == "parametres" or ecran_actuel == "niveaux":
                     ecran_actuel = "accueil"
                 else:
                     en_cours = False
 
         if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
-            mx, my = ev.pos
+            mx = ev.pos[0]
+            my = ev.pos[1]
 
             if ecran_actuel == "accueil":
                 if rect_jouer.collidepoint(mx, my):
                     ecran_actuel = "niveaux"
                 elif rect_param.collidepoint(mx, my):
                     ecran_actuel = "parametres"
-                elif rect_git.collidepoint(mx, my):
-                    webbrowser.open("https://github.com/adrisko/Re-Use")
 
             elif ecran_actuel == "niveaux":
                 if rect_retour.collidepoint(mx, my):
@@ -257,29 +222,26 @@ while en_cours:
                     if resultat == "quitter":
                         en_cours = False
 
-                # TODO: implementer les niveaux 2 et 3
                 elif rects_niveaux[1].collidepoint(mx, my):
-                    print("Niveau 2 - à venir")
+                    print("Niveau 2 - a venir")
 
                 elif rects_niveaux[2].collidepoint(mx, my):
-                    print("Niveau 3 - à venir")
+                    print("Niveau 3 - a venir")
 
             elif ecran_actuel == "parametres":
                 if rect_fermer.collidepoint(mx, my):
                     ecran_actuel = "accueil"
                 elif rect_toggle.collidepoint(mx, my):
-                    son_active = not son_active
-                    pygame.mixer.music.set_volume(volume / 10 if son_active else 0)
+                    if son_active:
+                        son_active = False
+                    else:
+                        son_active = True
                 elif rect_moins.collidepoint(mx, my):
                     if volume > 0:
-                        volume -= 1
-                        if son_active:
-                            pygame.mixer.music.set_volume(volume / 10)
+                        volume = volume - 1
                 elif rect_plus.collidepoint(mx, my):
                     if volume < 10:
-                        volume += 1
-                        if son_active:
-                            pygame.mixer.music.set_volume(volume / 10)
+                        volume = volume + 1
 
     pygame.display.flip()
     horloge.tick(60)

@@ -1,8 +1,25 @@
 # Re-Use
-Re-use est un jeu engagé qui vise à l'apprentissage du recyclage pour touselle monde 
 
-Le principe du jeu est simple, a chaque partie une multitude d'objets vous êtes proposée il faut choisir la bonne poubelle associée pour recycler l'objet. 
+Re-Use est un jeu educatif qui apprend le recyclage de maniere ludique.
 
-Lors de la dernière phase du jeu grâce aux objets recyclés, de nouveaux objets peuvent être assemblés et fabriqués.
+Le principe du jeu est simple : a chaque partie, des objets arrivent et il faut les lancer dans la bonne poubelle de tri. Le joueur marque des points pour chaque objet bien trie.
+
+Le jeu est fait en Python avec Pygame.
+
+## Comment lancer le jeu
+
+```
+cd src
+python interface.py
+```
+
+## Membres de l'equipe
+
+- BEN M'CHICHI-RGUIBI Kays
+- HOUACHMA Aymen
+- MYSLIWIEC Sacha
+- GONCALVES Anthony
+- CHALOM--CORBE Adrien
+- FACCHINI Thomas
 
 Made in Villejuif
