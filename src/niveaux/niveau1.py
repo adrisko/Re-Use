@@ -1,6 +1,7 @@
 import pygame
 import math
 import random
+from src.physics import appliquer_gravite, mettre_a_jour_position, verifier_collision, GRAVITE
 
 def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
     pygame.display.set_caption("Re-Use - Niveau 1")
@@ -294,9 +295,8 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         vy = (dy/dist) * puissance
         sx, sy, svx, svy = float(ox), float(oy), vx, vy
         for i in range(55):
-            svy += 0.45
-            sx  += svx
-            sy  += svy
+            svy = appliquer_gravite(svy, GRAVITE)
+            sx, sy = mettre_a_jour_position(sx, sy, svx, svy)
             if sy > SOL_Y:
                 break
             rayon = max(2, 5 - i//10)
@@ -390,9 +390,8 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
 
         # Physique vol
         if vol is not None:
-            vol["vy"] += 0.45
-            vol["x"]  += vol["vx"]
-            vol["y"]  += vol["vy"]
+            vol["vy"] = appliquer_gravite(vol["vy"], GRAVITE)
+            vol["x"], vol["y"] = mettre_a_jour_position(vol["x"], vol["y"], vol["vx"], vol["vy"])
 
             # Rebond sol
             if vol["y"] >= SOL_Y - 12:
@@ -421,7 +420,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
             if vol is not None:
                 for p in poubelles:
                     zone = pygame.Rect(p["x"]+2, p["y"]-14, p["w"]-4, p["h"]+14)
-                    if zone.collidepoint(int(vol["x"]), int(vol["y"])):
+                    if verifier_collision(vol["x"], vol["y"], zone):
                         ok = vol["info"]["type"] == p["type"]
                         ajouter_particules(int(vol["x"]), int(vol["y"]), p["couleur"], ok)
                         p["shake"] = 14
