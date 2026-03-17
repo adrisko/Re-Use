@@ -1,9 +1,11 @@
 import pygame
 from src.niveaux.niveau1 import lancer_niveau1
 
+# initialisation de pygame et du mixer pour le son
 pygame.init()
 pygame.mixer.init()
 
+# on recupere la taille de l'ecran pour le fullscreen
 info = pygame.display.Info()
 LARGEUR = info.current_w
 HAUTEUR = info.current_h
@@ -53,6 +55,7 @@ def bouton_cercle(surface, texte, cx, cy, r, fond, col_txt):
     return pygame.Rect(cx - r, cy - r, r * 2, r * 2)
 
 
+# dessine l'ecran d'accueil avec le titre et les boutons
 def dessiner_accueil():
     fenetre.fill(VERT_BG)
     pygame.draw.circle(fenetre, (16, 52, 20), (LARGEUR - 180, 160), 380)
@@ -66,6 +69,7 @@ def dessiner_accueil():
     fenetre.blit(re,  (tx, ty))
     fenetre.blit(use, (tx + re.get_width(), ty))
 
+    # petit slogan en dessous du titre
     sous = police_sous.render("Trie · Recycle · Sauve la planete ", True, GRIS)
     fenetre.blit(sous, ((LARGEUR - sous.get_width()) // 2, ty + 115))
 
@@ -99,6 +103,7 @@ def dessiner_accueil():
     return rect_jouer, rect_param, rect_git
 
 
+# TODO: ajouter le niveau 2 ici
 def dessiner_niveaux():
     fenetre.fill(VERT_BG)
     pygame.draw.circle(fenetre, (16, 52, 20), (LARGEUR - 160, 200), 320)
@@ -140,6 +145,7 @@ def dessiner_niveaux():
     return rects, rect_retour
 
 
+# fenetre de parametres, on met un overlay sombre par dessus
 def dessiner_parametres():
     overlay = pygame.Surface((LARGEUR, HAUTEUR), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, 210))
@@ -200,6 +206,7 @@ def dessiner_parametres():
 
 
 # ===================== BOUCLE PRINCIPALE =====================
+# boucle principale du jeu, tourne à 60 fps
 horloge  = pygame.time.Clock()
 en_cours = True
 
@@ -251,6 +258,7 @@ while en_cours:
                     if resultat == "quitter":
                         en_cours = False
 
+                # TODO: implementer les niveaux 2 et 3
                 elif rects_niveaux[1].collidepoint(mx, my):
                     print("Niveau 2 - à venir")
 

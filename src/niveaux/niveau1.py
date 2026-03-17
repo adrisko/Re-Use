@@ -87,6 +87,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
             "icone": ic, "shake": 0,
         })
 
+    # on genere 12 objets aleatoires pour la partie
     TOTAL_OBJETS = 12
     sequence = [random.choice(OBJETS_MODELES).copy() for _ in range(TOTAL_OBJETS)]
     idx = 0
@@ -172,6 +173,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         co = p["corps"]
         cl = tuple(min(255, v+50) for v in c)
 
+        # c'est pour le shake quand on touche la poubelle
         sx = 0
         if p["shake"] > 0:
             sx = int(math.sin(p["shake"] * 1.4) * 5)
@@ -263,6 +265,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         pygame.draw.arc(fenetre, NOIR, pygame.Rect(jx+18, jy-16, 16, 10), math.pi, 2*math.pi, 2)
 
     # --- FOND ---
+    # on dessine le ciel avec un dégradé ligne par ligne
     def dessiner_fond():
         for ly in range(SOL_Y):
             t = ly / SOL_Y
@@ -310,6 +313,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         fenetre.blit(t, (ox - t.get_width()//2, oy-46))
 
     # --- PARTICULES ---
+    # on limite a 20 particules par explosion pour pas trop charger
     def ajouter_particules(px, py, coul, ok):
         for _ in range(20):
             angle  = random.uniform(0, 2*math.pi)
@@ -375,6 +379,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         fenetre.blit(t3, (LARGEUR//2 - t3.get_width()//2, HAUTEUR//2 + 60))
 
     # ===================== BOUCLE =====================
+    # boucle principale du niveau 1, tourne a 60 fps
     en_cours = True
 
     while en_cours:
@@ -393,7 +398,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
             vol["vy"] = appliquer_gravite(vol["vy"], GRAVITE)
             vol["x"], vol["y"] = mettre_a_jour_position(vol["x"], vol["y"], vol["vx"], vol["vy"])
 
-            # Rebond sol
+            # rebond au sol, le -0.35 c'est pour inverser et reduire la vitesse
             if vol["y"] >= SOL_Y - 12:
                 if abs(vol["vy"]) > 3:
                     vol["vy"] *= -0.35
@@ -495,6 +500,7 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
                 if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
                     if objet_joueur is not None and vol is None:
                         vise = True
+                # si le joueur relache le clic, on lance l'objet
                 if ev.type == pygame.MOUSEBUTTONUP and ev.button == 1:
                     if vise and objet_joueur is not None and vol is None:
                         vise = False
