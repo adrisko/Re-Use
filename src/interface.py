@@ -1,4 +1,5 @@
 import pygame
+import webbrowser
 from src.niveaux.niveau1 import lancer_niveau1
 
 # initialisation de pygame et du mixer pour le son
