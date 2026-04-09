@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 
 def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
@@ -79,16 +80,13 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
     message_fin = ""
 
     dechets_sur_tapis = []
-
     timer_apparition = 0
     DELAI_APPARITION = 90
-
     anim_envoi = []
 
     feedback_texte = ""
     feedback_couleur = BLANC
     feedback_timer = 0
-
     tapis_offset = 0
 
     def creer_dechet():
@@ -154,7 +152,8 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
         fenetre.blit(touche_texte, (x + POUB_W // 2 - touche_texte.get_width() // 2, y + POUB_H + 8))
 
     def dessiner_animations():
-        for a in anim_envoi:
+        for i in range(len(anim_envoi)):
+            a = anim_envoi[i]
             couleur = couleurs_types[a["type"]]
             taille = a["taille"]
             cx = int(a["x"])
@@ -176,7 +175,7 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
         texte_prog = police_petite.render("{} / {} tries".format(objets_tries, OBJECTIF), True, GRIS)
         fenetre.blit(texte_prog, (LARGEUR - texte_prog.get_width() - 20, 16))
         texte_vit = police_petite.render("Vitesse : {}".format(vitesse_tapis), True, GRIS)
-        fenetre.blit(texte_vit, (LARGEUR - texte_vit.get_width() - 20, 32))
+        fenetre.blit(texte_vit, (LARGEUR - texte_vit.get_width() // 2 - 20, 32))
 
     def dessiner_feedback():
         if feedback_timer > 0:
@@ -226,23 +225,25 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
                         message_fin = "Perdu..."
                 else:
                     dechets_restants.append(dechets_sur_tapis[i])
-            dechets_sur_tapis.clear()
-            for d in dechets_restants:
-                dechets_sur_tapis.append(d)
+            while len(dechets_sur_tapis) > 0:
+                dechets_sur_tapis.remove(dechets_sur_tapis[0])
+            for i in range(len(dechets_restants)):
+                dechets_sur_tapis.append(dechets_restants[i])
 
         anims_restantes = []
-        for a in anim_envoi:
+        for i in range(len(anim_envoi)):
+            a = anim_envoi[i]
             dx = a["cible_x"] - a["x"]
             dy = a["cible_y"] - a["y"]
-            dist = (dx * dx + dy * dy) ** 0.5
+            dist = math.sqrt(dx * dx + dy * dy)
             if dist > 5:
-                vitesse_anim = 12
-                a["x"] = a["x"] + (dx / dist) * vitesse_anim
-                a["y"] = a["y"] + (dy / dist) * vitesse_anim
+                a["x"] = a["x"] + (dx / dist) * 12
+                a["y"] = a["y"] + (dy / dist) * 12
                 anims_restantes.append(a)
-        anim_envoi.clear()
-        for a in anims_restantes:
-            anim_envoi.append(a)
+        while len(anim_envoi) > 0:
+            anim_envoi.remove(anim_envoi[0])
+        for i in range(len(anims_restantes)):
+            anim_envoi.append(anims_restantes[i])
 
         if feedback_timer > 0:
             feedback_timer = feedback_timer - 1
@@ -250,11 +251,11 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
         dessiner_fond()
         dessiner_tapis()
 
-        for p in poubelles:
-            dessiner_poubelle(p)
+        for i in range(len(poubelles)):
+            dessiner_poubelle(poubelles[i])
 
-        for d in dechets_sur_tapis:
-            dessiner_dechet(d)
+        for i in range(len(dechets_sur_tapis)):
+            dessiner_dechet(dechets_sur_tapis[i])
 
         dessiner_animations()
         dessiner_hud()
@@ -290,10 +291,10 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
                         type_poubelle = ""
                         cible_x = 0
                         cible_y = 0
-                        for p in poubelles:
-                            if p["touche"] == touche_pressee:
-                                type_poubelle = p["type"]
-                                cible_x = p["x"] + POUB_W // 2
+                        for i in range(len(poubelles)):
+                            if poubelles[i]["touche"] == touche_pressee:
+                                type_poubelle = poubelles[i]["type"]
+                                cible_x = poubelles[i]["x"] + POUB_W // 2
                                 cible_y = POUB_Y + POUB_H // 2
                                 break
 

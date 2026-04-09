@@ -2,6 +2,7 @@ import pygame
 import webbrowser
 from niveaux.niveau1 import lancer_niveau1
 from niveaux.niveau2 import lancer_niveau2
+from niveaux.niveau3 import lancer_niveau3
 
 pygame.init()
 
@@ -206,7 +207,13 @@ while en_cours:
                         en_cours = False
 
                 elif rects_niveaux[2].collidepoint(mx, my):
-                    print("Niveau 3 - a venir")
+                    resultat, score_obtenu = lancer_niveau3(fenetre, LARGEUR, HAUTEUR)
+                    if score_obtenu > meilleur_score:
+                        meilleur_score = score_obtenu
+                    pygame.display.set_caption("Re-Use")
+                    ecran_actuel = "accueil"
+                    if resultat == "quitter":
+                        en_cours = False
 
             elif ecran_actuel == "parametres":
                 if rect_fermer.collidepoint(mx, my):
