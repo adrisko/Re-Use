@@ -1,5 +1,3 @@
-# niveau1.py - le niveau 1 du jeu de recyclage
-# le joueur doit lancer les dechets dans la bonne poubelle
 import pygame
 import math
 import random
@@ -10,7 +8,6 @@ from physics import calculer_vitesse_lancer, rebond_sol, calculer_distance, GRAV
 def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
     pygame.display.set_caption("Re-Use - Niveau 1")
 
-    # couleurs utilisees dans le niveau
     VERT_VIF = (72, 240, 100)
     BLANC = (230, 245, 232)
     GRIS = (90, 115, 95)
@@ -22,14 +19,12 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
     VERT_P = (30, 150, 60)
     MARRON_P = (110, 70, 30)
 
-    # polices
     police_grande = pygame.font.SysFont("Arial", 42, bold=True)
     police_moyenne = pygame.font.SysFont("Arial", 24)
     police_petite = pygame.font.SysFont("Arial", 16)
 
     horloge = pygame.time.Clock()
 
-    # les couleurs associees a chaque type de dechet
     couleurs_types = {
         "plastique": BLEU_P,
         "papier": JAUNE_P,
@@ -37,7 +32,6 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         "organique": MARRON_P,
     }
 
-    # liste des objets possibles (on utilise des dictionnaires)
     objets_modeles = [
         {"nom": "Bouteille", "type": "plastique", "taille": 20},
         {"nom": "Canette", "type": "plastique", "taille": 18},
@@ -48,19 +42,16 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         {"nom": "Epluchures", "type": "organique", "taille": 16},
     ]
 
-    # positions importantes
     SOL_Y = HAUTEUR - 90
     JOUEUR_X = int(LARGEUR * 0.15)
     JOUEUR_Y = SOL_Y - 70
 
-    # configuration des poubelles
     POUB_W = 80
     POUB_H = 100
     POUB_ESPACE = int((LARGEUR * 0.5) / 4)
     POUB_X_DEBUT = int(LARGEUR * 0.45)
     POUB_Y = SOL_Y - POUB_H
 
-    # on cree les 4 poubelles avec une liste de dictionnaires
     poubelles = [
         {"type": "plastique", "label": "Plastique", "couleur": BLEU_P, "x": POUB_X_DEBUT},
         {"type": "papier", "label": "Papier", "couleur": JAUNE_P, "x": POUB_X_DEBUT + POUB_ESPACE},
@@ -68,7 +59,6 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         {"type": "organique", "label": "Bio", "couleur": MARRON_P, "x": POUB_X_DEBUT + 3 * POUB_ESPACE},
     ]
 
-    # on genere la sequence d'objets a trier
     TOTAL_OBJETS = 12
     sequence = []
     for i in range(TOTAL_OBJETS):
@@ -80,7 +70,6 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         }
         sequence.append(objet)
 
-    # variables du jeu
     index_objet = 0
     objet_actuel = sequence[0]
     score = 0
@@ -88,7 +77,6 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
     fin = False
     message_fin = ""
 
-    # variables pour le lancer
     en_visee = False
     vol_x = 0.0
     vol_y = 0.0
@@ -97,12 +85,9 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
     en_vol = False
     vol_info = None
 
-    # feedback pour le joueur
     feedback_texte = ""
     feedback_couleur = BLANC
     feedback_timer = 0
-
-    # --- fonctions de dessin ---
 
     def dessiner_fond():
         pygame.draw.rect(fenetre, CIEL, (0, 0, LARGEUR, SOL_Y))
@@ -205,7 +190,6 @@ def lancer_niveau1(fenetre, LARGEUR, HAUTEUR):
         else:
             return nouveau_index, sequence[nouveau_index], False, ""
 
-    # === boucle du niveau ===
     en_cours_niveau = True
 
     while en_cours_niveau:
