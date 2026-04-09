@@ -25,6 +25,10 @@ police_petite = pygame.font.SysFont("Arial", 18)
 
 son_active = True
 volume = 7
+
+pygame.mixer.music.load("sunset_deep_house_mix.mp3")
+pygame.mixer.music.set_volume(volume / 10)
+pygame.mixer.music.play(-1)
 meilleur_score = 0
 ecran_actuel = "accueil"
 horloge = pygame.time.Clock()
@@ -251,14 +255,18 @@ while en_cours:
                 elif rect_toggle.collidepoint(mx, my):
                     if son_active:
                         son_active = False
+                        pygame.mixer.music.pause()
                     else:
                         son_active = True
+                        pygame.mixer.music.unpause()
                 elif rect_moins.collidepoint(mx, my):
                     if volume > 0:
                         volume = volume - 1
+                        pygame.mixer.music.set_volume(volume / 10)
                 elif rect_plus.collidepoint(mx, my):
                     if volume < 10:
                         volume = volume + 1
+                        pygame.mixer.music.set_volume(volume / 10)
 
     pygame.display.flip()
     horloge.tick(60)
