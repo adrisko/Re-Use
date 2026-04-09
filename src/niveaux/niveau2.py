@@ -6,23 +6,25 @@ import math
 def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
     pygame.display.set_caption("Re-Use - Niveau 2")
 
-    VERT_VIF = (72, 240, 100)
-    BLANC = (230, 245, 232)
-    GRIS = (90, 115, 95)
-    NOIR = (5, 10, 6)
-    CIEL = (40, 80, 140)
-    SOL_COULEUR = (55, 100, 58)
-    BLEU_P = (30, 90, 180)
-    JAUNE_P = (210, 180, 30)
-    VERT_P = (30, 150, 60)
-    MARRON_P = (110, 70, 30)
-    TAPIS_COULEUR = (80, 80, 80)
-    TAPIS_LIGNE = (100, 100, 100)
+    VERT_F = (45, 90, 39)
+    VERT_C = (123, 198, 126)
+    BEIGE = (245, 240, 232)
+    ORANGE = (232, 137, 43)
+    BLANC = (255, 255, 255)
+    NOIR = (30, 30, 30)
+
+    BLEU_P = (50, 130, 220)
+    JAUNE_P = (230, 190, 50)
+    VERT_P = (60, 180, 80)
+    MARRON_P = (140, 90, 40)
+    TAPIS_COULEUR = (90, 90, 90)
+    TAPIS_LIGNE = (120, 120, 120)
 
     police_grande = pygame.font.SysFont("Arial", 42, bold=True)
     police_moyenne = pygame.font.SysFont("Arial", 24)
     police_petite = pygame.font.SysFont("Arial", 16)
     police_touche = pygame.font.SysFont("Arial", 20, bold=True)
+    police_btn = pygame.font.SysFont("Arial", 26, bold=True)
 
     horloge = pygame.time.Clock()
 
@@ -88,6 +90,13 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
     feedback_couleur = BLANC
     feedback_timer = 0
     tapis_offset = 0
+    rect_btn_fin = pygame.Rect(0, 0, 0, 0)
+    rect_menu_fin = pygame.Rect(0, 0, 0, 0)
+
+    def dessiner_coeur(cx, cy, couleur):
+        pygame.draw.circle(fenetre, couleur, (cx - 5, cy), 7)
+        pygame.draw.circle(fenetre, couleur, (cx + 5, cy), 7)
+        pygame.draw.polygon(fenetre, couleur, [(cx - 11, cy + 2), (cx + 11, cy + 2), (cx, cy + 14)])
 
     def creer_dechet():
         modele = random.choice(objets_modeles)
@@ -110,9 +119,9 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
         return False
 
     def dessiner_fond():
-        pygame.draw.rect(fenetre, CIEL, (0, 0, LARGEUR, HAUTEUR))
-        pygame.draw.rect(fenetre, SOL_COULEUR, (0, HAUTEUR - 90, LARGEUR, 90))
-        pygame.draw.line(fenetre, (70, 130, 55), (0, HAUTEUR - 90), (LARGEUR, HAUTEUR - 90), 3)
+        pygame.draw.rect(fenetre, BEIGE, (0, 0, LARGEUR, HAUTEUR))
+        pygame.draw.rect(fenetre, VERT_F, (0, HAUTEUR - 90, LARGEUR, 90))
+        pygame.draw.rect(fenetre, VERT_C, (0, HAUTEUR - 90, LARGEUR, 4))
 
     def dessiner_tapis():
         pygame.draw.rect(fenetre, TAPIS_COULEUR, (TAPIS_X_DEBUT, TAPIS_Y, TAPIS_X_FIN - TAPIS_X_DEBUT, TAPIS_H), border_radius=8)
@@ -122,9 +131,9 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
         while x < TAPIS_X_FIN - 10:
             pygame.draw.line(fenetre, TAPIS_LIGNE, (int(x), TAPIS_Y + 10), (int(x), TAPIS_Y + TAPIS_H - 10), 2)
             x = x + pas
-        pygame.draw.rect(fenetre, GRIS, (TAPIS_X_DEBUT, TAPIS_Y, TAPIS_X_FIN - TAPIS_X_DEBUT, TAPIS_H), 3, border_radius=8)
-        pygame.draw.circle(fenetre, GRIS, (TAPIS_X_DEBUT, TAPIS_Y + TAPIS_H // 2), 15)
-        pygame.draw.circle(fenetre, GRIS, (TAPIS_X_FIN, TAPIS_Y + TAPIS_H // 2), 15)
+        pygame.draw.rect(fenetre, NOIR, (TAPIS_X_DEBUT, TAPIS_Y, TAPIS_X_FIN - TAPIS_X_DEBUT, TAPIS_H), 3, border_radius=8)
+        pygame.draw.circle(fenetre, NOIR, (TAPIS_X_DEBUT, TAPIS_Y + TAPIS_H // 2), 15)
+        pygame.draw.circle(fenetre, NOIR, (TAPIS_X_FIN, TAPIS_Y + TAPIS_H // 2), 15)
 
     def dessiner_dechet(dechet):
         couleur = couleurs_types[dechet["type"]]
@@ -133,22 +142,21 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
         cy = int(dechet["y"])
         pygame.draw.rect(fenetre, couleur, (cx - taille // 2, cy - taille // 2, taille, taille), border_radius=6)
         pygame.draw.rect(fenetre, NOIR, (cx - taille // 2, cy - taille // 2, taille, taille), 2, border_radius=6)
-        texte = police_petite.render(dechet["nom"], True, BLANC)
+        texte = police_petite.render(dechet["nom"], True, NOIR)
         fenetre.blit(texte, (cx - texte.get_width() // 2, cy - taille // 2 - 18))
 
     def dessiner_poubelle(p):
         x = p["x"]
         y = POUB_Y
         c = p["couleur"]
-        pygame.draw.rect(fenetre, (50, 50, 50), (x, y + 10, POUB_W, POUB_H - 10), border_radius=6)
+        pygame.draw.rect(fenetre, (60, 60, 60), (x, y + 10, POUB_W, POUB_H - 10), border_radius=6)
         pygame.draw.rect(fenetre, c, (x, y + 10, POUB_W, 25), border_radius=6)
         pygame.draw.rect(fenetre, c, (x - 4, y, POUB_W + 8, 14), border_radius=4)
         texte = police_petite.render(p["label"], True, BLANC)
         fenetre.blit(texte, (x + POUB_W // 2 - texte.get_width() // 2, y + POUB_H - 18))
         symbole = symboles_touches[p["touche"]]
-        touche_texte = police_touche.render(symbole, True, c)
-        pygame.draw.rect(fenetre, NOIR, (x + POUB_W // 2 - 16, y + POUB_H + 6, 32, 28), border_radius=6)
-        pygame.draw.rect(fenetre, GRIS, (x + POUB_W // 2 - 16, y + POUB_H + 6, 32, 28), 2, border_radius=6)
+        touche_texte = police_touche.render(symbole, True, BLANC)
+        pygame.draw.rect(fenetre, c, (x + POUB_W // 2 - 16, y + POUB_H + 6, 32, 28), border_radius=6)
         fenetre.blit(touche_texte, (x + POUB_W // 2 - touche_texte.get_width() // 2, y + POUB_H + 8))
 
     def dessiner_animations():
@@ -161,21 +169,20 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
             pygame.draw.rect(fenetre, couleur, (cx - taille // 2, cy - taille // 2, taille, taille), border_radius=6)
 
     def dessiner_hud():
-        pygame.draw.rect(fenetre, (10, 25, 12), (0, 0, LARGEUR, 48))
-        texte_score = police_moyenne.render("Score : {}".format(score), True, VERT_VIF)
+        pygame.draw.rect(fenetre, VERT_F, (0, 0, LARGEUR, 48))
+        texte_score = police_moyenne.render("Score : {}".format(score), True, ORANGE)
         fenetre.blit(texte_score, (20, 10))
         for v in range(3):
             if v < vies:
-                couleur_vie = (200, 50, 70)
+                dessiner_coeur(220 + v * 35, 20, (220, 50, 50))
             else:
-                couleur_vie = (50, 50, 50)
-            pygame.draw.rect(fenetre, couleur_vie, (200 + v * 35, 14, 20, 20), border_radius=4)
+                dessiner_coeur(220 + v * 35, 20, (80, 80, 80))
         texte_niv = police_moyenne.render("Niveau 2 - Le Convoyeur", True, BLANC)
         fenetre.blit(texte_niv, (LARGEUR // 2 - texte_niv.get_width() // 2, 10))
-        texte_prog = police_petite.render("{} / {} tries".format(objets_tries, OBJECTIF), True, GRIS)
+        texte_prog = police_petite.render("{} / {} tries".format(objets_tries, OBJECTIF), True, VERT_C)
         fenetre.blit(texte_prog, (LARGEUR - texte_prog.get_width() - 20, 16))
-        texte_vit = police_petite.render("Vitesse : {}".format(vitesse_tapis), True, GRIS)
-        fenetre.blit(texte_vit, (LARGEUR - texte_vit.get_width() // 2 - 20, 32))
+        texte_vit = police_petite.render("Vitesse : {}".format(vitesse_tapis), True, VERT_C)
+        fenetre.blit(texte_vit, (LARGEUR - texte_vit.get_width() - 20, 32))
 
     def dessiner_feedback():
         if feedback_timer > 0:
@@ -184,18 +191,32 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
 
     def dessiner_ecran_fin():
         overlay = pygame.Surface((LARGEUR, HAUTEUR))
-        overlay.set_alpha(190)
-        overlay.fill((0, 0, 0))
+        overlay.set_alpha(200)
+        if message_fin == "Perdu...":
+            overlay.fill((100, 20, 20))
+        else:
+            overlay.fill((0, 0, 0))
         fenetre.blit(overlay, (0, 0))
-        t1 = police_grande.render(message_fin, True, VERT_VIF)
+        t1 = police_grande.render(message_fin, True, ORANGE)
         t2 = police_moyenne.render("Score final : {}".format(score), True, BLANC)
-        t3 = police_moyenne.render("ESC pour revenir au menu", True, GRIS)
-        fenetre.blit(t1, (LARGEUR // 2 - t1.get_width() // 2, HAUTEUR // 2 - 70))
-        fenetre.blit(t2, (LARGEUR // 2 - t2.get_width() // 2, HAUTEUR // 2))
-        fenetre.blit(t3, (LARGEUR // 2 - t3.get_width() // 2, HAUTEUR // 2 + 50))
+        fenetre.blit(t1, (LARGEUR // 2 - t1.get_width() // 2, HAUTEUR // 2 - 90))
+        fenetre.blit(t2, (LARGEUR // 2 - t2.get_width() // 2, HAUTEUR // 2 - 30))
+        if message_fin == "Perdu...":
+            btn_texte = "Recommencer"
+        else:
+            btn_texte = "Niveau suivant"
+        rect_btn = pygame.Rect(LARGEUR // 2 - 150, HAUTEUR // 2 + 20, 300, 55)
+        pygame.draw.rect(fenetre, ORANGE, rect_btn, border_radius=14)
+        txt_btn = police_btn.render(btn_texte, True, BLANC)
+        fenetre.blit(txt_btn, (LARGEUR // 2 - txt_btn.get_width() // 2, HAUTEUR // 2 + 32))
+        rect_menu = pygame.Rect(LARGEUR // 2 - 120, HAUTEUR // 2 + 90, 240, 45)
+        pygame.draw.rect(fenetre, VERT_F, rect_menu, border_radius=14)
+        txt_menu = police_btn.render("Menu", True, BLANC)
+        fenetre.blit(txt_menu, (LARGEUR // 2 - txt_menu.get_width() // 2, HAUTEUR // 2 + 100))
+        return rect_btn, rect_menu
 
     def dessiner_instructions():
-        texte = police_petite.render("Fleches pour trier : < Verre   ^ Plastique   v Papier   > Bio", True, GRIS)
+        texte = police_petite.render("Fleches pour trier : < Verre   ^ Plastique   v Papier   > Bio", True, VERT_F)
         fenetre.blit(texte, (LARGEUR // 2 - texte.get_width() // 2, TAPIS_Y + TAPIS_H + 20))
 
     en_cours_niveau = True
@@ -263,7 +284,7 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
         dessiner_instructions()
 
         if fin:
-            dessiner_ecran_fin()
+            rect_btn_fin, rect_menu_fin = dessiner_ecran_fin()
 
         pygame.display.flip()
         horloge.tick(60)
@@ -299,6 +320,9 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
                                 break
 
                         premier = dechets_sur_tapis[0]
+                        for i in range(1, len(dechets_sur_tapis)):
+                            if dechets_sur_tapis[i]["x"] < premier["x"]:
+                                premier = dechets_sur_tapis[i]
 
                         anim = {
                             "x": premier["x"],
@@ -314,7 +338,7 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
                             score = score + 100
                             objets_tries = objets_tries + 1
                             feedback_texte = "Bien trie ! +100"
-                            feedback_couleur = VERT_VIF
+                            feedback_couleur = VERT_C
                             feedback_timer = 40
 
                             if objets_tries % 5 == 0 and objets_tries > 0:
@@ -334,5 +358,15 @@ def lancer_niveau2(fenetre, LARGEUR, HAUTEUR):
                                 message_fin = "Perdu..."
 
                         dechets_sur_tapis.remove(premier)
+
+            if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
+                if fin:
+                    if rect_btn_fin.collidepoint(ev.pos[0], ev.pos[1]):
+                        if message_fin == "Perdu...":
+                            return "recommencer", score
+                        else:
+                            return "suivant", score
+                    if rect_menu_fin.collidepoint(ev.pos[0], ev.pos[1]):
+                        return "menu", score
 
     return "menu", score
